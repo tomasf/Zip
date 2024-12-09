@@ -1,4 +1,5 @@
 import Miniz
+import Foundation
 
 /// A ZIP archive stored in a file.
 public class FileZipArchive: ZipArchive {

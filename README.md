@@ -1,6 +1,12 @@
 # Zip
 
-Zip is a lightweight Swift package for working with Zip archives. It's built on top of [Miniz](https://github.com/richgel999/miniz) and includes the its entire implementation, so no external dependencies are required.
+Zip is a lightweight cross-platform Swift package for working with Zip archives. It's built on top of [Miniz](https://github.com/richgel999/miniz) and includes its entire implementation, so no external dependencies are required.
+
+Zip runs on macOS, Windows and Linux.
+
+[![Swift](https://github.com/tomasf/Zip/actions/workflows/swift.yml/badge.svg)](https://github.com/tomasf/Zip/actions/workflows/swift.yml)
+
+![Platforms](https://img.shields.io/badge/Platforms-macOS_|_Linux_|_Windows-cc9529?logo=swift&logoColor=white)
 
 ## Features
 
@@ -15,11 +21,11 @@ Add the package to your project using Swift Package Manager. In your `Package.sw
 
 ```swift
 dependencies: [
-	.package(url: "https://github.com/tomasf/zip.git", from: "1.0.0")
+    .package(url: "https://github.com/tomasf/Zip.git", from: "1.0.0")
 ]
 ```
 
-## Usage
+## Examples
 ### Writing to a file-based archive
 
 ```swift
@@ -30,11 +36,11 @@ archive.addFile(name: "hello.txt", data: Data("Hello, Zip!".utf8))
 try archive.finalize()
 ```
 
-### Reading from a file-based archive
+### Reading from a memory-based archive
 
 ```swift
-let archive = try FileZipArchive(forReadingFrom: URL(fileURLFileWithPath: "example.zip"))
+let archive = try MemoryZipArchive(data: zipData)
 if let data = archive.readFile(name: "hello.txt"), let text = String(data: data, encoding: .utf8) {
-	print("File content: \(text\")"
+    print("File content: \(text)")
 }
 ```

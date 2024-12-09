@@ -1,5 +1,5 @@
-import Foundation
 import Miniz
+import Foundation
 
 /// An abstract base class for working with ZIP archives.
 ///
@@ -9,7 +9,7 @@ import Miniz
 public class ZipArchive {
     internal var archive = mz_zip_archive()
 
-    fileprivate init() {
+    internal init() {
         memset(&archive, 0, MemoryLayout.size(ofValue: archive))
     }
 
