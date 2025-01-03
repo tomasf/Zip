@@ -22,7 +22,7 @@ public extension ZipArchive<Data> {
         }
 
         try get {
-            mz_zip_reader_init_mem(&$0, input, data.count, MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)
+            mz_zip_reader_init_mem(&$0, input, data.count, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue))
         }
 
         try get {
@@ -38,7 +38,7 @@ public extension ZipArchive<Data> {
         self.init(flag: true)
 
         try! get {
-            mz_zip_writer_init_heap_v2(&$0, 0, 0, MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)
+            mz_zip_writer_init_heap_v2(&$0, 0, 0, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue))
         }
     }
 
