@@ -64,8 +64,11 @@ struct Tests {
 
     @Test
     func files() throws {
+        // Use GitHub Actions temporary directory if available
+        let runnerTempDirectory = ProcessInfo.processInfo.environment["RUNNER­_TEMP"].map(URL.init(fileURLWithPath:))
+
         let fileManager = FileManager()
-        let url = fileManager.temporaryDirectory
+        let url = (runnerTempDirectory ?? fileManager.temporaryDirectory)
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("zip")
 
