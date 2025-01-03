@@ -64,7 +64,11 @@ struct Tests {
 
     @Test
     func files() throws {
-        let url = URL(fileURLWithPath: NSTemporaryDirectory().appending("\(UUID().uuidString).zip"))
+        let fileManager = FileManager()
+        let url = fileManager.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("zip")
+
         let archive = try ZipArchive(url: url)
         try archive.addFile(at: filename, data: data)
         #expect(try archive.fileContents(at: filename) == data)
@@ -77,6 +81,8 @@ struct Tests {
         try archive2.addFile(at: filename3, data: data3)
         #expect(try archive2.entries.count == 3)
         try archive2.finalize()
+
+        try? fileManager.removeItem(at: url)
     }
 
     @Test
