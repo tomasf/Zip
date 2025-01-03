@@ -13,7 +13,9 @@ public extension ZipArchive<Data> {
         // mz_zip_writer_init_from_reader_v2 sets m_pWrite to mz_zip_heap_write_func
         // This means miniz takes ownership of that memory and will free it.
 
-        let input = malloc(data.count)
+        guard let input = malloc(data.count) else {
+            throw ZipError.allocFailed
+        }
         _ = data.withUnsafeBytes { memcpy(input, $0.baseAddress, data.count) }
 
         try get {
