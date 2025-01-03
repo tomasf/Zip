@@ -16,7 +16,10 @@ public extension ZipArchive<Data> {
         guard let input = malloc(data.count) else {
             throw ZipError.allocFailed
         }
-        _ = data.withUnsafeBytes { memcpy(input, $0.baseAddress, data.count) }
+        data.withUnsafeBytes {
+            guard let pointer = $0.baseAddress else { return }
+            memcpy(input, pointer, data.count)
+        }
 
         try get {
             mz_zip_reader_init_mem(&$0, input, data.count, MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)
