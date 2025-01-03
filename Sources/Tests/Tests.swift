@@ -69,8 +69,8 @@ struct Tests {
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("zip")
 
-        print(url)
-        print(url.path)
+        try Data("Hello".utf8).write(to: url)
+        try? fileManager.removeItem(at: url)
 
         let archive = try ZipArchive(url: url)
         try archive.addFile(at: filename, data: data)
