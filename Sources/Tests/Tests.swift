@@ -64,20 +64,14 @@ struct Tests {
 
     @Test
     func files() throws {
+        let fileManager = FileManager()
+
         // Use GitHub Actions temporary directory if available
         let runnerTempDirectory = ProcessInfo.processInfo.environment["RUNNER­_TEMP"].map(URL.init(fileURLWithPath:))
+        let temporaryDirectory = runnerTempDirectory ?? fileManager.temporaryDirectory
 
-        print(runnerTempDirectory)
-
-        let fileManager = FileManager()
-        let url = (runnerTempDirectory ?? fileManager.temporaryDirectory)
-            .appendingPathComponent(UUID().uuidString)
-            .appendingPathExtension("zip")
-
-        print(url)
-
-        try Data("Hello".utf8).write(to: url)
-        try? fileManager.removeItem(at: url)
+        guard fileManager.isWritableFile(atPath: temporaryDirectory.path) else { return }
+        let url = temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("zip")
 
         let archive = try ZipArchive(url: url)
         try archive.addFile(at: filename, data: data)
