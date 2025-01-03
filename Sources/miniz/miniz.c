@@ -1,4 +1,5 @@
 #include "miniz.h"
+#include <sys/errno.h>
 /**************************************************************************
  *
  * Copyright 2013-2014 RAD Game Tools and Valve Software
@@ -5872,6 +5873,7 @@ mz_bool mz_zip_writer_init_file_v2(mz_zip_archive *pZip, const char *pFilename, 
 
     if (NULL == (pFile = MZ_FOPEN(pFilename, (flags & MZ_ZIP_FLAG_WRITE_ALLOW_READING) ? "w+b" : "wb")))
     {
+        printf("error: %d\n", errno);
         mz_zip_writer_end(pZip);
         return mz_zip_set_error(pZip, MZ_ZIP_FILE_OPEN_FAILED);
     }
