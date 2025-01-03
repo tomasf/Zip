@@ -13,9 +13,11 @@ public extension ZipArchive<URL> {
 
         let path = fileURL.path
         if FileManager().fileExists(atPath: path) {
+            print("file exists!")
             try get { mz_zip_reader_init_file(&$0, path, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)) }
             try get { mz_zip_writer_init_from_reader_v2(&$0, path, 0) }
         } else {
+            print("file does NOT exist")
             try get { mz_zip_writer_init_file_v2(&$0, path, 0, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)) }
         }
     }
