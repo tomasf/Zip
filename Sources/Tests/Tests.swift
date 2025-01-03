@@ -67,10 +67,14 @@ struct Tests {
         // Use GitHub Actions temporary directory if available
         let runnerTempDirectory = ProcessInfo.processInfo.environment["RUNNER­_TEMP"].map(URL.init(fileURLWithPath:))
 
+        print(runnerTempDirectory)
+
         let fileManager = FileManager()
         let url = (runnerTempDirectory ?? fileManager.temporaryDirectory)
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("zip")
+
+        print(url)
 
         try Data("Hello".utf8).write(to: url)
         try? fileManager.removeItem(at: url)
