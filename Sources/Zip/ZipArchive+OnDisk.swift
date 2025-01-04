@@ -12,11 +12,10 @@ public extension ZipArchive<URL> {
         self.init(flag: true)
 
         try fileURL.withUnsafeFileSystemRepresentation { path in
-            if FileManager().fileExists(atPath: fileURL.path) {
+            do {
                 try get { mz_zip_reader_init_file(&$0, path, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)) }
                 try get { mz_zip_writer_init_from_reader_v2(&$0, path, 0) }
-
-            } else {
+            } catch ZipError.fileOpenFailed {
                 try get { mz_zip_writer_init_file_v2(&$0, path, 0, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)) }
             }
         }
