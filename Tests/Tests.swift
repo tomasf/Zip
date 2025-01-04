@@ -3,6 +3,14 @@ import Testing
 import Foundation
 
 struct Tests {
+    let fileManager = FileManager()
+    let fileUUID = UUID()
+    var fileURL: URL {
+        fileManager.temporaryDirectory
+            .appendingPathComponent(fileUUID.uuidString)
+            .appendingPathExtension("zip")
+    }
+
     let filename = "file1"
     let filename2 = "file2"
     let filename3 = "file3"
@@ -64,25 +72,38 @@ struct Tests {
 
     @Test
     func files() throws {
-        let fileManager = FileManager()
-
-        let temp = fileManager.temporaryDirectory
-        let url = temp.appendingPathComponent(UUID().uuidString).appendingPathExtension("zip")
-
-        let archive = try ZipArchive(url: url)
+        let archive = try ZipArchive(url: fileURL)
         try archive.addFile(at: filename, data: data)
         #expect(try archive.fileContents(at: filename) == data)
         try archive.addFile(at: filename2, data: data2)
         #expect(try archive.fileContents(at: filename2) == data2)
         try archive.finalize()
 
-        let archive2 = try ZipArchive(url: url)
+        let archive2 = try ZipArchive(url: fileURL)
         #expect(try archive2.fileContents(at: filename) == data)
         try archive2.addFile(at: filename3, data: data3)
         #expect(try archive2.entries.count == 3)
         try archive2.finalize()
 
-        try? fileManager.removeItem(at: url)
+        try? fileManager.removeItem(at: fileURL)
+    }
+
+    @Test
+    func overwriteFile() throws {
+        let archive1 = try ZipArchive(url: fileURL, mode: .overwrite)
+        #expect(try archive1.entries.count == 0)
+        try archive1.addFile(at: filename, data: data)
+        try archive1.finalize()
+
+        let archive2 = try ZipArchive(url: fileURL, mode: .overwrite)
+        #expect(try archive2.entries.count == 0)
+        try archive2.addFile(at: filename, data: data2)
+        try archive2.finalize()
+
+        let archive3 = try ZipArchive(url: fileURL, mode: .readWrite)
+        #expect(try archive3.entries.count == 1)
+        #expect(try archive3.fileContents(at: filename) == data2)
+        archive3.close()
     }
 
     @Test
