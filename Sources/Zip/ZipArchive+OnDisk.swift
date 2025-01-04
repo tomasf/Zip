@@ -9,10 +9,10 @@ public extension ZipArchive<URL> {
     /// - Parameter fileURL: The file URL of the zip archive to be read or created.
     /// - Parameter mode: The mode to use. The default, `Mode.readWrite`, lets you read an archive and, optionally, add new files to it. Use `Mode.overwrite` to create a new empty archive and overwrite an existing file if it exists.
     /// - Throws: An error if the initialization fails, such as if the file cannot be read or written.
-    convenience init(url fileURL: URL, mode: Mode = .readWrite) throws {
+    convenience init(url fileURL: URL, mode: Mode = .readAdd) throws {
         self.init(archive: .init())
         try fileURL.withUnsafeFileSystemRepresentation { path in
-            if mode == .readWrite {
+            if mode == .readAdd {
                 do {
                     try get { mz_zip_reader_init_file(&$0, path, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)) }
                     try get { mz_zip_writer_init_from_reader_v2(&$0, path, 0) }
@@ -48,7 +48,7 @@ public extension ZipArchive<URL> {
     }
 
     enum Mode {
-        case readWrite
+        case readAdd
         case overwrite
     }
 }

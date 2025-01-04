@@ -100,7 +100,7 @@ struct Tests {
         try archive2.addFile(at: filename, data: data2)
         try archive2.finalize()
 
-        let archive3 = try ZipArchive(url: fileURL, mode: .readWrite)
+        let archive3 = try ZipArchive(url: fileURL, mode: .readAdd)
         #expect(try archive3.entries.count == 1)
         #expect(try archive3.fileContents(at: filename) == data2)
         archive3.close()
