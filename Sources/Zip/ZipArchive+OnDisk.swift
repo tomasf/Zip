@@ -25,6 +25,17 @@ public extension ZipArchive<URL> {
         }
     }
 
+    /// Closes the zip archive without writing the central directory to disk.
+    ///
+    /// This method ends the zip archive session without finalizing changes. Use this if you haven't
+    /// made changes and do not need to save the archive.
+    ///
+    /// After calling this method, the archive is no longer usable, and you must not perform additional
+    /// operations on it.
+    func close() {
+        mz_zip_writer_end(&archive)
+    }
+
     /// Finalizes the zip archive and writes it to disk.
     ///
     /// This method ensures all changes are saved and closes the archive. After this method is called,
