@@ -9,6 +9,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "Zip", dependencies: ["Miniz"]),
-        .target(name: "Miniz", path: "Sources/miniz", publicHeadersPath: ".")
+        .target(name: "Miniz", path: "Sources/miniz", publicHeadersPath: "."),
+        .testTarget(name: "Tests", dependencies: ["Zip"])
     ]
 )

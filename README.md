@@ -6,7 +6,7 @@ Zip runs on macOS, Windows and Linux.
 
 [![Swift](https://github.com/tomasf/Zip/actions/workflows/swift.yml/badge.svg)](https://github.com/tomasf/Zip/actions/workflows/swift.yml)
 
-![Platforms](https://img.shields.io/badge/Platforms-macOS_|_Linux_|_Windows-cc9529?logo=swift&logoColor=white)
+![Platforms](https://img.shields.io/badge/Platforms-macOS_%7C_Linux_%7C_Windows-47D?logo=swift&logoColor=white)
 
 ## Features
 
@@ -21,26 +21,42 @@ Add the package to your project using Swift Package Manager. In your `Package.sw
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tomasf/Zip.git", from: "1.0.0")
+    .package(url: "https://github.com/tomasf/Zip.git", from: "2.0.0")
 ]
 ```
 
 ## Examples
-### Writing to a file-based archive
+### Making a new memory-based archive
 
 ```swift
-import Zip
-
-let archive = try FileZipArchive(forWritingTo: URL(fileURLWithPath: "example.zip"))
-archive.addFile(name: "hello.txt", data: Data("Hello, Zip!".utf8))
-try archive.finalize()
+let archive = ZipArchive()
+try archive.addFile(at: "content.json", data: jsonData)
+let zipData = try archive.finalize()
 ```
 
-### Reading from a memory-based archive
+### Reading from an existing archive in memory
 
 ```swift
-let archive = try MemoryZipArchive(data: zipData)
-if let data = archive.readFile(name: "hello.txt"), let text = String(data: data, encoding: .utf8) {
-    print("File content: \(text)")
+let newArchive = try ZipArchive(data: zipData)
+
+let data = try archive.fileContents(at: "hello.txt")
+if let text = String(data: data, encoding: .utf8) {
+    print("Hello.txt contains: \(text)")
 }
 ```
+
+### Writing a file-based archive
+
+```swift
+let archive = try ZipArchive(url: archiveURL)
+try archive.addFile(at: "hello.txt", data: Data("Hello, Zip!".utf8))
+try archive.finalize() // Writes Zip data to disk
+```
+
+## Contributions
+
+Contributions are welcome! If you have ideas, suggestions, or bug reports, feel free to open an issue on GitHub. Pull requests are also appreciated.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
