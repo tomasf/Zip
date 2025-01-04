@@ -2,12 +2,10 @@ import Miniz
 import Foundation
 
 public class ZipArchive<Target> {
-    var archive = mz_zip_archive()
+    var archive: mz_zip_archive
 
-    init(flag: Bool) {
-        withUnsafeMutableBytes(of: &archive) { buffer in
-            _ = buffer.initializeMemory(as: UInt8.self, repeating: 0)
-        }
+    init(archive: mz_zip_archive) {
+        self.archive = archive
     }
 
     deinit {

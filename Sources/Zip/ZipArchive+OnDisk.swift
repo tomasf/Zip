@@ -9,8 +9,7 @@ public extension ZipArchive<URL> {
     /// - Parameter fileURL: The file URL of the zip archive to be read or created.
     /// - Throws: An error if the initialization fails, such as if the file cannot be read or written.
     convenience init(url fileURL: URL) throws {
-        self.init(flag: true)
-
+        self.init(archive: .init())
         try fileURL.withUnsafeFileSystemRepresentation { path in
             do {
                 try get { mz_zip_reader_init_file(&$0, path, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue)) }
@@ -29,5 +28,6 @@ public extension ZipArchive<URL> {
     /// - Throws: An error if the finalization process fails.
     func finalize() throws {
         try get { mz_zip_writer_finalize_archive(&$0) }
+        mz_zip_writer_end(&archive)
     }
 }

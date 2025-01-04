@@ -8,7 +8,7 @@ public extension ZipArchive<Data> {
     /// - Parameter data: The zip archive data used to initialize the archive.
     /// - Throws: An error if the archive initialization fails.
     convenience init(data: Data) throws {
-        self.init(flag: true)
+        self.init(archive: .init())
 
         // mz_zip_writer_init_from_reader_v2 sets m_pWrite to mz_zip_heap_write_func
         // This means miniz takes ownership of that memory and will free it.
@@ -35,7 +35,7 @@ public extension ZipArchive<Data> {
     /// This initializer sets up an empty memory-based archive,
     /// allowing both reading and writing of entries.
     convenience init() {
-        self.init(flag: true)
+        self.init(archive: .init())
 
         try! get {
             mz_zip_writer_init_heap_v2(&$0, 0, 0, mz_uint32(MZ_ZIP_FLAG_WRITE_ALLOW_READING.rawValue))
@@ -61,6 +61,7 @@ public extension ZipArchive<Data> {
             throw ZipError.invalidData
         }
 
+        mz_zip_writer_end(&archive)
         defer { mz_free(buffer) }
         return Data(bytes: buffer, count: size)
     }

@@ -34,7 +34,7 @@ struct Tests {
 
         // Initialize a new archive from that data
         let newArchive = try ZipArchive(data: archiveData)
-        #expect(try archive.entries.count == 2)
+        #expect(try newArchive.entries.count == 2)
 
         // Verify file contents
         #expect(try newArchive.fileContents(at: filename) == data)
