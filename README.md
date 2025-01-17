@@ -2,11 +2,9 @@
 
 Zip is a lightweight cross-platform Swift package for working with Zip archives. It's built on top of [Miniz](https://github.com/richgel999/miniz) and includes its entire implementation, so no external dependencies are required.
 
-Zip runs on macOS, Windows and Linux.
+Zip runs on Linux, Windows and all Apple platforms.
 
-[![Swift](https://github.com/tomasf/Zip/actions/workflows/swift.yml/badge.svg)](https://github.com/tomasf/Zip/actions/workflows/swift.yml)
-
-![Platforms](https://img.shields.io/badge/Platforms-macOS_%7C_Linux_%7C_Windows-47D?logo=swift&logoColor=white)
+[![Swift](https://github.com/tomasf/Zip/actions/workflows/swift.yml/badge.svg)](https://github.com/tomasf/Zip/actions/workflows/swift.yml) ![Platforms](https://img.shields.io/badge/Platforms-macOS_%7C_iOS_%7C_tvOS_%7C_watchOS_%7C_visionOS_%7C_Linux_%7C_Windows-47D?logo=swift&logoColor=white)
 
 ## Features
 
