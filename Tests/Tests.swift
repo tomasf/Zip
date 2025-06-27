@@ -124,4 +124,19 @@ struct Tests {
 
         #expect(capturedData == randomData)
     }
+
+    @Test
+    func readOnly() throws {
+        let archive1 = try ZipArchive(url: fileURL, mode: .overwrite)
+        try archive1.addFile(at: filename, data: data)
+        try archive1.finalize()
+
+        // Read-only should fail to modify the archive
+        let archive2 = try ZipArchive(url: fileURL, mode: .readOnly)
+        #expect(try archive2.fileContents(at: filename) == data)
+        #expect(throws: ZipError.self) {
+            try archive2.addFile(at: filename2, data: data2)
+        }
+        archive2.close()
+    }
 }
