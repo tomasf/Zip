@@ -1,4 +1,4 @@
-import Miniz
+@_implementationOnly import Miniz
 import Foundation
 
 public class ZipArchive<Target> {

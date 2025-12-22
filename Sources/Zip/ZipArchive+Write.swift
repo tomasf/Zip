@@ -1,5 +1,5 @@
 import Foundation
-import Miniz
+@_implementationOnly import Miniz
 
 public extension ZipArchive {
     /// Adds a file to the archive with the specified data and path.

@@ -1,5 +1,5 @@
 import Foundation
-import Miniz
+@_implementationOnly import Miniz
 
 public extension ZipArchive<Data> {
 

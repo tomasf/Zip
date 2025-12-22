@@ -1,5 +1,5 @@
 import Foundation
-import Miniz
+@_implementationOnly import Miniz
 
 public extension ZipArchive<URL> {
     /// Creates a `ZipArchive` instance for a disk-based zip archive at the specified file URL.

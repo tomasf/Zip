@@ -1,4 +1,4 @@
-import Miniz
+@_implementationOnly import Miniz
 import Foundation
 
 /// Swift representation of mz_zip_error

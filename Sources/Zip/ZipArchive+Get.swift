@@ -1,5 +1,5 @@
 import Foundation
-import Miniz
+@_implementationOnly import Miniz
 
 internal extension ZipArchive {
     func get<P: _Pointer>(_ body: (inout mz_zip_archive) -> P?) throws(ZipError) -> P {
