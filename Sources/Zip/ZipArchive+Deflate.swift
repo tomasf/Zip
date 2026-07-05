@@ -54,6 +54,14 @@ internal extension ZipArchive {
     }
 }
 
+/// Bundles the pointers shared with `DispatchQueue.concurrentPerform` tasks in `parallelDeflate`.
+/// Neither pointer type is Sendable, but each task only reads its own disjoint sub-range of
+/// `source` and writes its own disjoint index of `chunks`, so concurrent access is safe.
+private struct ParallelDeflateContext: @unchecked Sendable {
+    let source: UnsafeRawBufferPointer
+    let chunks: UnsafeMutableBufferPointer<Data?>
+}
+
 private extension ZipArchive {
     static var parallelThreshold: Int { 2 << 20 }
     static var parallelChunkSize: Int { 512 << 10 }
@@ -98,10 +106,11 @@ private extension ZipArchive {
         }
 
         data.withUnsafeBytes { (source: UnsafeRawBufferPointer) in
+            let context = ParallelDeflateContext(source: source, chunks: chunks)
             DispatchQueue.concurrentPerform(iterations: chunkCount) { chunkIndex in
-                let range = (chunkIndex * parallelChunkSize)..<Swift.min((chunkIndex + 1) * parallelChunkSize, source.count)
+                let range = (chunkIndex * parallelChunkSize)..<Swift.min((chunkIndex + 1) * parallelChunkSize, context.source.count)
                 let isLast = chunkIndex == chunkCount - 1
-                chunks[chunkIndex] = deflateChunk(UnsafeRawBufferPointer(rebasing: source[range]), isLast: isLast)
+                context.chunks[chunkIndex] = deflateChunk(UnsafeRawBufferPointer(rebasing: context.source[range]), isLast: isLast)
             }
         }
 
