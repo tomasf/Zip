@@ -20,13 +20,23 @@ public extension ZipArchive {
             throw ZipError.invalidPath
         }
 
-        try data.withUnsafeBytes { buffer in
-            guard let rawPointer = buffer.baseAddress else {
-                fatalError("Failed to get raw pointer from data.")
+        if compression.usesFastDeflate, let deflated = Self.fastDeflate(data) {
+            let crc = Self.crc32(of: data)
+            try deflated.withUnsafeBytes { buffer in
+                try get {
+                    mz_zip_writer_add_mem_ex(
+                        &$0, path, buffer.baseAddress, buffer.count, nil, 0,
+                        mz_uint(MZ_ZIP_FLAG_COMPRESSED_DATA.rawValue),
+                        mz_uint64(data.count), crc
+                    )
+                }
             }
+            return
+        }
 
+        try data.withUnsafeBytes { buffer in
             try get {
-                mz_zip_writer_add_mem(&$0, path, rawPointer, buffer.count, mz_uint(compression.value))
+                mz_zip_writer_add_mem(&$0, path, buffer.baseAddress, buffer.count, mz_uint(compression.value))
             }
         }
     }
@@ -73,5 +83,13 @@ public struct CompressionLevel: ExpressibleByIntegerLiteral, Sendable {
     /// - Parameter value: The integer value representing the compression level.
     public init(integerLiteral value: Int) {
         self.init(value)
+    }
+
+    // The fast deflate path (parallel chunked deflate for large files, libcompression
+    // where available for small ones) produces output roughly equivalent to the default
+    // level, so it's a good substitute for levels up to that. Higher levels fall through
+    // to the regular miniz path, which compresses harder.
+    internal var usesFastDeflate: Bool {
+        value >= 1 && value <= Self.default.value
     }
 }

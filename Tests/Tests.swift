@@ -126,6 +126,40 @@ struct Tests {
     }
 
     @Test
+    func largeCompressibleFile() throws {
+        // Large enough to exercise the parallel chunked deflate path, and compressible
+        // so the fast deflate path is actually taken rather than falling back to stored data
+        var gen = SystemRandomNumberGenerator()
+        let line = Data("value=\(gen.next() as UInt64) padding padding padding padding\n".utf8)
+        var largeData = Data(capacity: 6 << 20)
+        while largeData.count < 6 << 20 {
+            largeData.append(line)
+        }
+
+        let archive = ZipArchive()
+        try archive.addFile(at: filename, data: largeData)
+        let archiveData = try archive.finalize()
+        #expect(archiveData.count < largeData.count)
+
+        let readBack = try ZipArchive(data: archiveData)
+        #expect(try readBack.fileContents(at: filename) == largeData)
+    }
+
+    @Test
+    func incompressibleFile() throws {
+        // Random data can't be deflated; the writer should still round-trip it correctly
+        var gen = SystemRandomNumberGenerator()
+        let randomData = (0..<(3 << 17)).map { _ in gen.next() }.withUnsafeBufferPointer(Data.init(buffer:))
+
+        let archive = ZipArchive()
+        try archive.addFile(at: filename, data: randomData)
+        let archiveData = try archive.finalize()
+
+        let readBack = try ZipArchive(data: archiveData)
+        #expect(try readBack.fileContents(at: filename) == randomData)
+    }
+
+    @Test
     func readOnly() throws {
         let archive1 = try ZipArchive(url: fileURL, mode: .overwrite)
         try archive1.addFile(at: filename, data: data)
