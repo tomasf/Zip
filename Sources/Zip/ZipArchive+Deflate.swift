@@ -4,6 +4,18 @@ import Dispatch
 #if canImport(Compression)
 @_implementationOnly import Compression
 #endif
+#if canImport(Darwin)
+import Darwin
+
+// Apple platforms ship a hardware-accelerated CRC-32 in the system zlib, which is much faster
+// than miniz's implementation. Looking it up with dlsym avoids declaring a dependency on zlib,
+// which isn't guaranteed to exist on other platforms.
+private let systemZlibCRC32: (@convention(c) (CUnsignedLong, UnsafeRawPointer?, CUnsignedInt) -> CUnsignedLong)? = {
+    guard let handle = dlopen("/usr/lib/libz.1.dylib", RTLD_LAZY),
+          let symbol = dlsym(handle, "crc32") else { return nil }
+    return unsafeBitCast(symbol, to: (@convention(c) (CUnsignedLong, UnsafeRawPointer?, CUnsignedInt) -> CUnsignedLong).self)
+}()
+#endif
 
 // Fast deflate support. Large files are split into chunks that are deflated in parallel;
 // each chunk ends on a byte-aligned sync-flush boundary with the final-block bit set only
@@ -25,7 +37,19 @@ internal extension ZipArchive {
     /// The standard zip CRC32 of the data.
     static func crc32(of data: Data) -> UInt32 {
         data.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
-            UInt32(mz_crc32(0, buffer.baseAddress?.assumingMemoryBound(to: UInt8.self), buffer.count))
+            #if canImport(Darwin)
+            if let systemZlibCRC32 {
+                var crc: CUnsignedLong = 0
+                var remaining = buffer
+                while !remaining.isEmpty {
+                    let chunkSize = Swift.min(remaining.count, Int(CUnsignedInt.max))
+                    crc = systemZlibCRC32(crc, remaining.baseAddress, CUnsignedInt(chunkSize))
+                    remaining = UnsafeRawBufferPointer(rebasing: remaining[chunkSize...])
+                }
+                return UInt32(crc)
+            }
+            #endif
+            return UInt32(mz_crc32(0, buffer.baseAddress?.assumingMemoryBound(to: UInt8.self), buffer.count))
         }
     }
 }
